@@ -1,34 +1,23 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native';
+
+import { Song } from '@/interfaces';
 
 import { SearchBar } from '@/components/SearchBar';
 import { SongsList } from '@/components/SongsList';
+import { PlayMusic } from '@/components/PlayMusic';
 
 import { fetchSongOptions } from '@/api';
 
-interface Song {
-  title: string;
-  artist: string;
-}
 
-// let songslist:Song[] = [
-//   {
-//     title: 'sha-boom',
-//     artist: 'The Chords'
-//   },
-//   {
-//     title: "Can't Stop",
-//     artist: 'Red Hot Chili Peppers'
-//   },
-//   {
-//     title: 'Never Gonna Give You Up',
-//     artist: 'Rick Astley'
-//   },
-// ]
-
-const ExploreScreen = () => {
+const ExploreScreen: React.FC = () => {
   const [songOptionName, setSongOptionName] = useState<string>('');
+  // const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+    // { title: "amit", 
+    //   channel: "laniado", 
+    //   url: "dafdaf"
+    // });
   const [songsList, setSongsList] = useState<Song[]>([]);
 
   const handleSongOptionName = (songName: string) => {
@@ -40,13 +29,11 @@ const ExploreScreen = () => {
   };
 
   const searchSongOptions = async () => {
-    const songOptions = await fetchSongOptions(songOptionName);
-    console.log("searchOptions: ", songOptions);
-    setSongsList(songOptions);
-  }
-
-  const searchSong = () => {
-    console.log("selectSong from explore screen: ", selectedSong);
+    if (songOptionName) {
+      const songOptions = await fetchSongOptions(songOptionName);
+      console.log("searchOptions: ", songOptions);
+      setSongsList(songOptions);
+    }
   }
 
   useEffect(() => {
@@ -54,15 +41,21 @@ const ExploreScreen = () => {
   }, [songOptionName]);
 
   useEffect(() => {
-    searchSong();
+    // searchSong();
   }, [selectedSong]);
 
   return (
     <SafeAreaView style={{ gap: 10 }}>
-      <SearchBar onSongOptionNameChange={handleSongOptionName}/>
-      <SongsList list={songsList} onSelectSong={handleSelectSong} />
+      { selectedSong ? (
+        <PlayMusic song={selectedSong}/>
+      ) : (
+        <>
+          <SearchBar onSongOptionNameChange={handleSongOptionName}/>
+          <SongsList list={songsList} onSelectSong={handleSelectSong} />
+        </>
+      )}
     </SafeAreaView>
-  );
+  )
 }
 
 // const styles = StyleSheet.create({

@@ -1,11 +1,7 @@
 import * as React from "react";
 import { View, StyleSheet } from "react-native";
 import { ListItem } from 'react-native-elements';
-
-interface Song {
-    title: string;
-    artist: string;
-}
+import { Song } from "@/interfaces";
 
 interface SongsListProps {
     list: Song[];
@@ -28,7 +24,7 @@ export const SongsList: React.FC<SongsListProps> = ({ list = [], onSelectSong })
                     >
                         <ListItem.Content>
                             <ListItem.Title style={styles.title}>{ song.title }</ListItem.Title>
-                            <ListItem.Subtitle style={styles.subtitle}>{ song.artist }</ListItem.Subtitle>
+                            <ListItem.Subtitle style={styles.subtitle}>{ song.channel }</ListItem.Subtitle>
                         </ListItem.Content>
                     </ListItem>
                 ))
