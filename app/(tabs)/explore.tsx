@@ -12,12 +12,12 @@ import { fetchSongOptions } from '@/api';
 
 const ExploreScreen: React.FC = () => {
   const [songOptionName, setSongOptionName] = useState<string>('');
-  // const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
-    // { title: "amit", 
-    //   channel: "laniado", 
-    //   url: "dafdaf"
-    // });
+  // const [selectedSong, setSelectedSong] = useState<Song | null>(
+  //   { title: "amit", 
+  //     channel: "laniado", 
+  //     url: "dafdaf"
+  //   });
   const [songsList, setSongsList] = useState<Song[]>([]);
 
   const handleSongOptionName = (songName: string) => {
