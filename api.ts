@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
+import { connectedUser } from './data';
 
 const baseUrl = "http://127.0.0.1:8000";
 // const baseUrl = "http://10.0.2.2:8000";
@@ -36,7 +37,6 @@ export const login = async (userName: string, password: string) => {
     const response = await axios.post(
       `${baseUrl}/users/login`, 
       rawBody,
-      // { headers: { "Content-Type": "application/json" } } // Set Content-Type header
     );
     return response.data;
   } catch (error) {
@@ -50,11 +50,49 @@ export const register = async (userName: string, email: string, password: string
     const response = await axios.post(
       `${baseUrl}/users/register`, 
       rawBody,
-      // { headers: { "Content-Type": "application/json" } } // Set Content-Type header
     );
     return response.data;
   } catch (error) {
     console.error("error: ", error);
+  }
+}
+
+
+// export const createPlaylist = async (playlistName: string) => {
+//   try {
+//     const rawBody: {}
+//   }
+// }
+
+// export const addSongToPlaylist = async (songName: string) => {
+
+// }
+
+export const fetchPlaylists = async () => {
+  try {
+    // const params = { user_id: connectedUser.user_id };
+    // const response = await axios.get(
+    //   `${baseUrl}/playlists`, 
+    //   { params }
+    // );
+    const response = await axios.get(
+      `${baseUrl}/playlists/user/${connectedUser.user_id}`
+    );
+    console.log("songs: ", response);
+    return response.data.playlists;
+  } catch (error) {
+    console.error("error: ", error);
+    return [];
+  }
+}
+
+export const fetchPlaylistSongs = async (playlistId: number) => {
+  try {
+    const response = await axios.get(`${baseUrl}/playlists/${playlistId}`);
+    return response.data.songs;
+  } catch (error) {
+    console.error("error: ", error);
+    return [];
   }
 }
 

@@ -18,6 +18,7 @@ const ExploreScreen: React.FC = () => {
   //     channel: "laniado", 
   //     url: "dafdaf"
   //   });
+  // const [songsList, setSongsList] = useState<Song[]>([{ title: "sha-boom", channel: "laniado", url: "nfmaddf" }]);
   const [songsList, setSongsList] = useState<Song[]>([]);
 
   const handleSongOptionName = (songName: string) => {

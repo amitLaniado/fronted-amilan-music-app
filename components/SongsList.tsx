@@ -24,6 +24,7 @@ export const SongsList: React.FC<SongsListProps> = ({ list = [], onSelectSong })
                     >
                         <ListItem.Content>
                             <ListItem.Title style={styles.title}>{ song.title }</ListItem.Title>
+                            {/* <ListItem.Title style={styles.title}>{ song.song_name }</ListItem.Title> */}
                             <ListItem.Subtitle style={styles.subtitle}>{ song.channel }</ListItem.Subtitle>
                         </ListItem.Content>
                     </ListItem>

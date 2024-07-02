@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
-import { Icon } from '@rneui/themed';  // Provides access to various icon sets
-import { downloadMP3 } from '@/api';
+import { Icon } from 'react-native-elements';
+import { downloadMP3, addSongToPlaylist } from '@/api';
 import { Audio } from 'expo-av';
 
 import Slider from '@react-native-community/slider';
@@ -18,6 +18,7 @@ interface PlayMusicInterface {
 export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
     const [songTime, setSongTime] = useState<number | undefined>(0);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const [isLike, setIsLike] = useState<boolean>(false);
 
     // useEffect(() => {
     //     const onCreateComponent = async () => {
@@ -59,10 +60,32 @@ export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
         setIsPlaying(true);
     };
 
+    const handleAddSongToPlaylist = (playlistName: string) => {
+
+    }
+
     return (
         <View style={styles.container}>
-            <Text style={styles.songTitle}>{song.title}</Text>
-            <Text style={styles.songChannel}>{song.channel}</Text>
+            <View style={styles.showTimesView}>
+                <View>
+                    <Text style={styles.songTitle}>{song.title}</Text>
+                    <Text style={styles.songChannel}>{song.channel}</Text>
+                </View>
+                <TouchableOpacity onPress={() => setIsLike(!isLike)}>
+                    <Icon
+                        name={isLike ? 'heart' : 'hearto'}
+                        type="antdesign"
+                        size={30}
+                        // color="white"
+                        iconStyle={styles.likeIcon}
+                    />
+                    {/* <MaterialIcons
+                        name={isLike ? 'heart' : 'hearto'}
+                        size={40}
+                        color="white"
+                    /> */}
+                </TouchableOpacity>
+            </View>
             <View style={styles.showTimesView}>
                 <Text style={styles.showTimesTexts}>3:50</Text>
                 <Text style={styles.showTimesTexts}>{ songTime }</Text>
@@ -74,14 +97,17 @@ export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
                 step={1}
                 value={songTime}
                 onValueChange={(val) => val && setSongTime(val)}
-                minimumTrackTintColor="#57ad18"
+                // minimumTrackTintColor="#57ad18"
+                // maximumTrackTintColor="#d3d3d3"
+                // thumbTintColor="#65ad31"
+                minimumTrackTintColor="rgb(0, 150, 0)"
                 maximumTrackTintColor="#d3d3d3"
-                thumbTintColor="#65ad31"
+                thumbTintColor="rgb(0, 130, 0)"
             />
 
             <TouchableOpacity onPress={() => setIsPlaying(!isPlaying)}>
                 <Icon
-                    name={isPlaying ? 'pause' : 'play-arrow'} // Use appropriate icons from your icon library
+                    name={isPlaying ? 'pause' : 'play-arrow'}
                     size={40}
                     color="white"
                 />
@@ -106,6 +132,11 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: "#ababab",
     },
+    likeIcon: {
+        marginTop: 10,
+        marginRight: 10,
+        color: "rgb(0, 150, 0)",
+    },
     showTimesView: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -117,7 +148,7 @@ const styles = StyleSheet.create({
     },
     slider: {
         // paddingTop: -10,
-        marginTop: -10
+        marginTop: -5
         // marginHorizontal: 5
     },
   });

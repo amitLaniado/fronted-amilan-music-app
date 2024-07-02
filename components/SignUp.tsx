@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Switch, Text, TextInput, View } from "react-native"
 import { register } from "@/api"; 
-import { connectUser } from "@/data";
+import { user } from "@/models";
 
 interface SignUpProps {
     setIsLogin: (isLogin: boolean) => void;
@@ -15,7 +15,7 @@ export const SignUp: React.FC<SignUpProps> = ({ setIsLogin }) => {
     const handleRegister = async () => {
         // testNetwork();
         const result_user = await register(username, email, password);
-        connectUser(result_user);
+        user.updateUser(result_user);
         result_user && setIsLogin(true);
     }
 

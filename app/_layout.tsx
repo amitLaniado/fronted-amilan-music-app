@@ -32,17 +32,17 @@ export default function RootLayout() {
 
   return (
     <>
-      {
-        isLogin ? 
+      {/* {
+        isLogin ? */}
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="+not-found" />
             </Stack>
           </ThemeProvider>
-          :           
-          <LoginScreen setIsLogin={setIsLogin} /> 
-      }
+          {/* :           
+          <LoginScreen setIsLogin={setIsLogin} />
+      } */}
     </>
   );
 }
