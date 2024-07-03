@@ -1,26 +1,18 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import { login } from "@/api"; 
-// import { testNetwork } from "@/api"; 
 // import { connectUser } from "@/data";
 import { user } from "@/models";
 
-interface SignInProps {
-    setIsLogin: (isLogin: boolean) => void;
-}  
-
-export const SignIn: React.FC<SignInProps> = ({ setIsLogin }) => {
+export const SignIn = () => {
     const [isRemember, setIsRemember] = useState<boolean>(false);
     const [username, setUsername] =  useState<string>("");
     const [password, setPassword]=  useState<string>("");
 
     const handleLogin = async () => {
-        // testNetwork();
         const result_user = await login(username, password);
-        // connectUser(result_user);
-        // user = new User(result_user.user_id, result_user.user_name, result_user.email);
-        user.updateUser(result_user);
-        result_user && setIsLogin(true);
+        console.log("result_user: ", result_user);
+        user.updateUser(result_user.user_id);
     }
 
     return (

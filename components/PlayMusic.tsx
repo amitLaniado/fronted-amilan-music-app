@@ -8,7 +8,6 @@ import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
 
 import * as Font from 'expo-font';
-// import { AppLoading } from 'expo-app-loading';
 
 import { Song } from "@/interfaces";
 
@@ -17,9 +16,11 @@ interface PlayMusicInterface {
 }
 
 export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
-    const [songTime, setSongTime] = useState<number | undefined>(0);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [isLike, setIsLike] = useState<boolean>(false);
+    const [sound, setSound] = useState<Audio.Sound | null>(null);
+    const [currentPosition, setCurrentPosition] = useState<number>(0);
+    const [duration, setDuration] = useState<number>(0);
 
     useEffect(() => {
         const onCreateComponent = async () => {
@@ -67,32 +68,54 @@ export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
         console.log("playMP3 filePath = ", filePath)
     
         await Audio.setAudioModeAsync({
-            allowsRecordingIOS: false,
+            // allowsRecordingIOS: false,
+            allowsRecordingIOS: true,
             staysActiveInBackground: true,
-            // interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
             playsInSilentModeIOS: true,
-            // interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
             shouldDuckAndroid: true,
             playThroughEarpieceAndroid: false,
         });
 
-        try {
-            // const remoteUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
-            // const { sound } = await Audio.Sound.createAsync({ uri: remoteUrl });
-            const { sound } = await Audio.Sound.createAsync({ uri: filePath });
-    
-            sound.setOnPlaybackStatusUpdate((status) => {
-                if (status.isLoaded && status.didJustFinish) {
-                    console.log('Successfully finished playing');
-                    sound.unloadAsync();
+        try {    
+            const { sound: newSound } = await Audio.Sound.createAsync({ uri: filePath });
+            setSound(newSound);
+            const status = await newSound.getStatusAsync();
+            if (status.isLoaded) {
+                setDuration(status.durationMillis || 0);
+            }
+
+            newSound.setOnPlaybackStatusUpdate((status) => {
+                if (status.isLoaded) {
+                    setCurrentPosition(status.positionMillis);
+                    if (status.didJustFinish) {
+                        setIsPlaying(false);
+                        newSound.unloadAsync();
+                    }
                 }
             });
     
-            await sound.playAsync();
+            await newSound.playAsync();
             setIsPlaying(true);
         } catch (error) {
             console.error("Error playing sound:", error);
         }
+    };
+
+    const togglePlayPause = async () => {
+        if (sound) {
+            if (isPlaying) {
+                await sound.pauseAsync();
+            } else {
+                await sound.playAsync();
+            }
+            setIsPlaying(!isPlaying);
+        }
+    };
+
+    const formatTime = (milliseconds: number) => {
+        const minutes = Math.floor(milliseconds / 60000);
+        const seconds = Math.floor((milliseconds % 60000) / 1000);
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     };
 
     const handleAddSongToPlaylist = (playlistName: string) => {
@@ -111,36 +134,26 @@ export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
                         name={isLike ? 'heart' : 'hearto'}
                         type="antdesign"
                         size={30}
-                        // color="white"
                         iconStyle={styles.likeIcon}
                     />
-                    {/* <MaterialIcons
-                        name={isLike ? 'heart' : 'hearto'}
-                        size={40}
-                        color="white"
-                    /> */}
                 </TouchableOpacity>
             </View>
             <View style={styles.showTimesView}>
-                <Text style={styles.showTimesTexts}>3:50</Text>
-                <Text style={styles.showTimesTexts}>{ songTime }</Text>
+                <Text style={styles.showTimesTexts}>{ formatTime(currentPosition) }</Text>
+                <Text style={styles.showTimesTexts}>{ formatTime(duration) }</Text>
             </View>
             <Slider
                 style={styles.slider}
                 minimumValue={0}
-                maximumValue={100}
-                step={1}
-                value={songTime}
-                onValueChange={(val) => val && setSongTime(val)}
-                // minimumTrackTintColor="#57ad18"
-                // maximumTrackTintColor="#d3d3d3"
-                // thumbTintColor="#65ad31"
+                maximumValue={duration}
+                value={currentPosition}
+                onValueChange={(val) => sound && sound.setPositionAsync(val)}
                 minimumTrackTintColor="rgb(0, 150, 0)"
                 maximumTrackTintColor="#d3d3d3"
                 thumbTintColor="rgb(0, 130, 0)"
             />
 
-            <TouchableOpacity onPress={() => setIsPlaying(!isPlaying)}>
+            <TouchableOpacity onPress={togglePlayPause}>
                 <Icon
                     name={isPlaying ? 'pause' : 'play-arrow'}
                     size={40}

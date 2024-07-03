@@ -9,6 +9,8 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 
 import { LoginScreen } from './login';
 
+import { user } from '@/models';
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -18,7 +20,7 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  const [isLogin, setIsLogin] = useState<boolean>(false);
+  const [userId, setUserId] = useState(user.getUserId());
 
   useEffect(() => {
     if (loaded) {
@@ -26,23 +28,30 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+  useEffect(() => {
+    // const handleUserChange = () => {
+      setUserId(user.getUserId());
+    // };
+  }, [user.getUserId()]);
+
   if (!loaded) {
     return null;
   }
 
   return (
     <>
-      {/* {
-        isLogin ? */}
+      {
+        // user.getUserId() !== -1 ?
+        userId !== -1 ?
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
             <Stack>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="+not-found" />
             </Stack>
           </ThemeProvider>
-          {/* :           
-          <LoginScreen setIsLogin={setIsLogin} />
-      } */}
+          :
+          <LoginScreen />
+      }
     </>
   );
 }

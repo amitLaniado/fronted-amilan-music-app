@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
-import { connectedUser } from './data';
+// import { connectedUser } from './data';
+import { user } from "@/models";
 
 // const baseUrl = "http://127.0.0.1:8000";
 const baseUrl = "https://backend-amilan-music-app.onrender.com";
@@ -74,7 +75,7 @@ export const fetchPlaylists = async () => {
     //   { params }
     // );
     const response = await axios.get(
-      `${baseUrl}/playlists/user/${connectedUser.user_id}`
+      `${baseUrl}/playlists/user/${user.getUserId()}`
     );
     console.log("songs: ", response);
     return response.data.playlists;

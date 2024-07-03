@@ -3,11 +3,7 @@ import { SafeAreaView, StyleSheet, Image, View, Text, TextInput, Switch, Pressab
 import { SignIn } from "@/components/SignIn";
 import { SignUp } from "@/components/SignUp";
 
-interface LoginProps {
-    setIsLogin: (isLogin: boolean) => void;
-}  
-
-export const LoginScreen: React.FC<LoginProps> = ({ setIsLogin }) => {
+export const LoginScreen = () => {
     const [isInSignIn, setIsInSignIn] = useState<boolean>(true);
 
     return (
@@ -29,7 +25,7 @@ export const LoginScreen: React.FC<LoginProps> = ({ setIsLogin }) => {
             </View>
 
             <View style={styles.optionsView}>
-                { isInSignIn ? <SignIn setIsLogin={setIsLogin} /> : <SignUp setIsLogin={setIsLogin} /> }
+                { isInSignIn ? <SignIn /> : <SignUp /> }
             </View>
 
             {/* <Text style={styles.underline}>TEST UNDERLINE</Text> */}

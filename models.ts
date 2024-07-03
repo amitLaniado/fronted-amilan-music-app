@@ -9,10 +9,14 @@ export class User {
         this.email = email;
     }
 
-    public updateUser (anotherUser: {user_id: number, user_name: string, email: string}) {
-        this.userId = anotherUser.user_id;
-        this.userName = anotherUser.user_name;
-        this.email = anotherUser.email;
+    // public updateUser (anotherUser: {user_id: number, user_name: string, email: string}) {
+    //     this.userId = anotherUser.user_id;
+    //     this.userName = anotherUser.user_name;
+    //     this.email = anotherUser.email;
+    // }
+
+    public updateUser (user_id: number) {
+        this.userId = user_id;
     }
 
     public getUserId(): number {

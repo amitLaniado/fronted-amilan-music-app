@@ -23,8 +23,7 @@ export const PlaylistsList: React.FC<PlaylistsListProps> = ({ list = [], onSelec
                     >
                         <ListItem.Content>
                             <ListItem.Title style={styles.title}>{ playlist.playlist_name }</ListItem.Title>
-                            {/* <ListItem.Subtitle style={styles.songsAmount}>{ playlist.songsAmount }</ListItem.Subtitle> */}
-                            <ListItem.Subtitle style={styles.songsAmount}>3 songs</ListItem.Subtitle>
+                            <ListItem.Subtitle style={styles.songsAmount}>{ playlist.songs_amount } songs</ListItem.Subtitle>
                         </ListItem.Content>
                     </ListItem>
                 ))
