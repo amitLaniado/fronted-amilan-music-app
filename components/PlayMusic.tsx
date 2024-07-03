@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { Icon } from 'react-native-elements';
-import { downloadMP3, addSongToPlaylist } from '@/api';
+// import { downloadMP3, addSongToPlaylist } from '@/api';
+import { downloadMP3 } from '@/api';
 import { Audio } from 'expo-av';
 
 import Slider from '@react-native-community/slider';
@@ -20,20 +21,20 @@ export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [isLike, setIsLike] = useState<boolean>(false);
 
-    // useEffect(() => {
-    //     const onCreateComponent = async () => {
-    //         console.log("selectSong from explore screen PlayMusic component: ", song);
-    //         if (song) {
-    //             const path = await downloadMP3(song.url, 'sample.mp3');
-    //             console.log("path: ", path);
-    //             if (path) {
-    //                 playMP3(path);
-    //             }
-    //         }
-    //     }
+    useEffect(() => {
+        const onCreateComponent = async () => {
+            console.log("selectSong from explore screen PlayMusic component: ", song);
+            if (song) {
+                const path = await downloadMP3(song.url, 'sample.mp3');
+                console.log("path: ", path);
+                if (path) {
+                    playMP3(path);
+                }
+            }
+        }
 
-    //     onCreateComponent();
-    // }, [song]);
+        onCreateComponent();
+    }, [song]);
 
     useEffect(() => {
         const loadFonts = async () => {
@@ -46,18 +47,52 @@ export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
         loadFonts();
     }, [])
 
-    const playMP3 = async (filePath: string): Promise<void> => {
-        const { sound } = await Audio.Sound.createAsync({ uri: filePath });
-    
-        sound.setOnPlaybackStatusUpdate((status) => {
-            if (status.isLoaded && status.didJustFinish) {
-            console.log('Successfully finished playing');
-            sound.unloadAsync();
-            }
-        });
+    const getAudioPermissions = async () => {
+        const { status } = await Audio.requestPermissionsAsync();
+        if (status !== 'granted') {
+            alert('Audio permission is required!');
+            return false;
+        }
+        return true;
+    };
         
-        await sound.playAsync();
-        setIsPlaying(true);
+    const playMP3 = async (filePath: string): Promise<void> => {
+
+        const hasPermission = await getAudioPermissions();
+        if (!hasPermission) {
+            console.log("hasPermission = ", hasPermission);
+            return
+        };
+    
+        console.log("playMP3 filePath = ", filePath)
+    
+        await Audio.setAudioModeAsync({
+            allowsRecordingIOS: false,
+            staysActiveInBackground: true,
+            // interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+            playsInSilentModeIOS: true,
+            // interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+            shouldDuckAndroid: true,
+            playThroughEarpieceAndroid: false,
+        });
+
+        try {
+            // const remoteUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+            // const { sound } = await Audio.Sound.createAsync({ uri: remoteUrl });
+            const { sound } = await Audio.Sound.createAsync({ uri: filePath });
+    
+            sound.setOnPlaybackStatusUpdate((status) => {
+                if (status.isLoaded && status.didJustFinish) {
+                    console.log('Successfully finished playing');
+                    sound.unloadAsync();
+                }
+            });
+    
+            await sound.playAsync();
+            setIsPlaying(true);
+        } catch (error) {
+            console.error("Error playing sound:", error);
+        }
     };
 
     const handleAddSongToPlaylist = (playlistName: string) => {
