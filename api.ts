@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
-// import { connectedUser } from './data';
 import { user } from "@/models";
+import { Song } from "@/interfaces";
 
 // const baseUrl = "http://127.0.0.1:8000";
 const baseUrl = "https://backend-amilan-music-app.onrender.com";
@@ -56,24 +56,40 @@ export const register = async (userName: string, email: string, password: string
   }
 }
 
-
 // export const createPlaylist = async (playlistName: string) => {
 //   try {
 //     const rawBody: {}
 //   }
 // }
 
-// export const addSongToPlaylist = async (songName: string) => {
+export const createSongToPlaylist = async (song: Song, playlistId: number) => {
+  try {
+    const rawBody: { song_name: string, channel: string, url: string, playlist_id: number} = { song_name: song.title, channel: song.channel, url: song.url, playlist_id: playlistId };
+    const response = await axios.post(
+      `${baseUrl}/playlists/create_song`, 
+      rawBody,
+    );
+    return response.data.playlist_song_id;
+  } catch (error) {
+    console.error("error: ", error);
+  }
+}
 
-// }
+export const deleteSongToPlaylist = async (song: Song, playlistId: number) => {
+  try {
+    const rawBody: { song_name: string, channel: string, url: string, playlist_id: number} = { song_name: song.title, channel: song.channel, url: song.url, playlist_id: playlistId };
+    const response = await axios.delete(
+      `${baseUrl}/playlists/delete_song`, 
+      rawBody,
+    );
+    return response.data.playlist_song_id;
+  } catch (error) {
+    console.error("error: ", error);
+  }
+}
 
 export const fetchPlaylists = async () => {
   try {
-    // const params = { user_id: connectedUser.user_id };
-    // const response = await axios.get(
-    //   `${baseUrl}/playlists`, 
-    //   { params }
-    // );
     const response = await axios.get(
       `${baseUrl}/playlists/user/${user.getUserId()}`
     );
@@ -94,26 +110,3 @@ export const fetchPlaylistSongs = async (playlistId: number) => {
     return [];
   }
 }
-
-// export const testNetwork = async () => {
-//   console.log("test network");
-//   const youtube_search_url = "https://www.googleapis.com/youtube/v3/search"
-    
-//   const youtube_params = {
-//       "part": "snippet",
-//       "q": "sha-boom",
-//       "type": "video",
-//       "maxResults": 10,
-//       "key": "AIzaSyAGSeY-PSmVhutAdGMb9tKOWN6-HR-OTUU"
-//   }
-  
-//   try {
-//     const response = await axios.get(youtube_search_url, {
-//       params: youtube_params
-//     });
-//     console.log(response.data);
-//   } catch (error) {
-//     console.error('Error fetching data:', error);
-//   }
-
-// }

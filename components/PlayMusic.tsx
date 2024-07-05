@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { Icon } from 'react-native-elements';
-// import { downloadMP3, addSongToPlaylist } from '@/api';
-import { downloadMP3 } from '@/api';
+import { downloadMP3, createSongToPlaylist, deleteSongToPlaylist } from '@/api';
 import { Audio } from 'expo-av';
 
 import Slider from '@react-native-community/slider';
@@ -10,6 +9,8 @@ import Slider from '@react-native-community/slider';
 import * as Font from 'expo-font';
 
 import { Song } from "@/interfaces";
+
+import { user } from "@/models";
 
 interface PlayMusicInterface {
     song: Song
@@ -118,10 +119,22 @@ export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
         return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     };
 
-    const handleAddSongToPlaylist = (playlistName: string) => {
-
+    const getLikePlaylistId = () => {
+        const likePlaylist = user.getPlaylists().find(playlist => playlist.playlist_name == 'liked music')
+        return likePlaylist?.playlist_id ?? null;
     }
 
+    const addOrDeleteSongToLikeSongsPlaylist = () => {
+        const likePlaylistId = getLikePlaylistId();
+        
+        if (!likePlaylistId)
+            return console.error('Liked music playlist not found');
+    
+        const action = isLike ? deleteSongToPlaylist : createSongToPlaylist;
+        action(song, likePlaylistId);
+        setIsLike(!isLike);
+    }
+    
     return (
         <View style={styles.container}>
             <View style={styles.showTimesView}>
@@ -129,7 +142,7 @@ export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
                     <Text style={styles.songTitle}>{song.title}</Text>
                     <Text style={styles.songChannel}>{song.channel}</Text>
                 </View>
-                <TouchableOpacity onPress={() => setIsLike(!isLike)}>
+                <TouchableOpacity onPress={addOrDeleteSongToLikeSongsPlaylist}>
                     <Icon
                         name={isLike ? 'heart' : 'hearto'}
                         type="antdesign"
@@ -167,7 +180,6 @@ export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
 const styles = StyleSheet.create({
     container: {
         width: "95%",
-        // height: 40,
         marginHorizontal: 10,
     },
     songTitle: {
@@ -189,7 +201,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingTop: 10,
-        // marginHorizontal: 5,
     },
     showTimesTexts: {
         color: "white",

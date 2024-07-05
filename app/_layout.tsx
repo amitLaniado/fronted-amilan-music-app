@@ -20,19 +20,21 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  const [userId, setUserId] = useState(user.getUserId());
+  const [userId, setUserId] = useState<number>(user.getUserId());
 
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
-
+  
   useEffect(() => {
-    // const handleUserChange = () => {
+    const interval = setInterval(() => {
       setUserId(user.getUserId());
-    // };
-  }, [user.getUserId()]);
+    }, 1000); // Check for user ID changes every second
+
+    return () => clearInterval(interval); // Cleanup the interval on component unmount
+  }, []);
 
   if (!loaded) {
     return null;

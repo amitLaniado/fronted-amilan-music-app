@@ -4,26 +4,14 @@ import { useEffect, useState } from 'react';
 import { Playlist } from '@/interfaces';
 import { Icon } from 'react-native-elements';
 import { ShowPlaylist } from '@/components/ShowPlaylist';
-import { fetchPlaylists } from '@/api';
+import { user } from '@/models';
 
 const LibraryScreen = () => {
-  // const [playlistList, setPlaylistList] = useState<Playlist[]>([]);
-  const [playlistList, setPlaylistList] = useState<Playlist[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
 
   const handleSelectPlaylist = (playlist:Playlist) => {
     setSelectedPlaylist(playlist);
   }
-
-  useEffect(() => {
-    const fetchPlaylistsData = async () => {
-      const playlists = await fetchPlaylists();
-      console.log("playlists: ", playlists);
-      setPlaylistList(playlists);
-    };
-
-    fetchPlaylistsData();
-  }, []);
 
   return (
     <SafeAreaView style={{ backgroundColor: "#181818" }}>
@@ -44,7 +32,7 @@ const LibraryScreen = () => {
         selectedPlaylist ? 
         ( <ShowPlaylist playlist={selectedPlaylist}/>)
         : 
-        ( <PlaylistsList list={playlistList} onSelectPlaylist={handleSelectPlaylist} /> )
+        ( <PlaylistsList list={user.getPlaylists()} onSelectPlaylist={handleSelectPlaylist} /> )
 
       }
     </SafeAreaView>
