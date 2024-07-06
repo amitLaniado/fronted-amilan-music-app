@@ -43,7 +43,6 @@ export default function RootLayout() {
   return (
     <>
       {
-        // user.getUserId() !== -1 ?
         userId !== -1 ?
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
             <Stack>

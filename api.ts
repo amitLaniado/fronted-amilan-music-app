@@ -56,11 +56,19 @@ export const register = async (userName: string, email: string, password: string
   }
 }
 
-// export const createPlaylist = async (playlistName: string) => {
-//   try {
-//     const rawBody: {}
-//   }
-// }
+export const createPlaylist = async (playlistName: string) => {
+  try {
+    const rawBody: { playlist_name: string, user_id: number} = { playlist_name: playlistName, user_id: user.getUserId() };
+    console.log("rawBody: ", rawBody);
+    const response = await axios.post(
+      `${baseUrl}/playlists/`, 
+      rawBody,
+    );
+    return response.data.playlist_song_id;
+  } catch (error) {
+    console.error("error: ", error);
+  }
+}
 
 export const createSongToPlaylist = async (song: Song, playlistId: number) => {
   try {

@@ -1,7 +1,7 @@
 import { Playlist, Song } from "@/interfaces"
 import React, { useEffect, useState } from "react";
 import { SongsList } from "./SongsList";
-import { View } from "react-native";
+import { StyleSheet, Pressable, View, Text } from "react-native";
 import { fetchPlaylistSongs } from "../api"
 import { PlayMusic } from "./PlayMusic";
 
@@ -22,8 +22,6 @@ export const ShowPlaylist: React.FC<ShowPlaylistProps> = ({ playlist }) => {
         fetchData();
     }, []);
     
-    // getPlaylistSongs(playlist.playlist_id);
-
     const handleSelectSong = (song:Song) => {
         setSelectedSong(song);
     };
@@ -31,7 +29,15 @@ export const ShowPlaylist: React.FC<ShowPlaylistProps> = ({ playlist }) => {
     return (
         <View>
             { selectedSong ? (
-                <PlayMusic song={selectedSong}/>
+                <>
+                    <Pressable 
+                        onPress={() => setSelectedSong(null)}
+                        style={styles.cancelButton}
+                    >
+                        <Text style={styles.cancelButtonText}>X</Text>
+                    </Pressable>
+                    <PlayMusic song={selectedSong}/>
+                </>
             ) : (
                 <SongsList list={playlistSongs} onSelectSong={handleSelectSong}/>
             )}
@@ -39,3 +45,20 @@ export const ShowPlaylist: React.FC<ShowPlaylistProps> = ({ playlist }) => {
     )
 
 }
+
+const styles = StyleSheet.create({
+    cancelButton: {
+        width: 40,
+        borderRadius: 50,
+        backgroundColor: "red",
+        padding: 4,
+        position: "absolute",
+        right: 60,
+    },
+    cancelButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        fontSize: 25,
+    },    
+})
