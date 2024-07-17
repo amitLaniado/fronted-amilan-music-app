@@ -1,7 +1,8 @@
 import * as React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
 import { ListItem } from 'react-native-elements';
 import { Song } from "@/interfaces";
+import { Icon } from 'react-native-elements';
 
 interface SongsListProps {
     list: Song[];
@@ -9,9 +10,12 @@ interface SongsListProps {
 }
 
 export const SongsList: React.FC<SongsListProps> = ({ list = [], onSelectSong }) => {
-    console.log("I am inside SongsList component. list = ", list);
     if (!Array.isArray(list))
         list = [];
+
+    const showSongProperties = (song: Song) => {
+
+    }
     
     return (
         <View style={styles.container}>
@@ -22,10 +26,19 @@ export const SongsList: React.FC<SongsListProps> = ({ list = [], onSelectSong })
                         containerStyle={styles.listItem}
                         onPress={() => onSelectSong(song)}    
                     >
-                        <ListItem.Content>
-                            <ListItem.Title style={styles.title}>{ song.title }</ListItem.Title>
-                            {/* <ListItem.Title style={styles.title}>{ song.song_name }</ListItem.Title> */}
-                            <ListItem.Subtitle style={styles.subtitle}>{ song.channel }</ListItem.Subtitle>
+                        <ListItem.Content style={styles.listItemContent}>
+                            <View>
+                                <ListItem.Title style={styles.title}>{ song.title }</ListItem.Title>
+                                <ListItem.Subtitle style={styles.subtitle}>{ song.channel }</ListItem.Subtitle>
+                            </View>
+                            <Pressable onPress={() => showSongProperties(song)}>
+                                <Icon
+                                    name="ellipsis1"
+                                    type="antdesign"
+                                    size={30}
+                                    iconStyle={styles.menuIcon}
+                                />
+                            </Pressable>
                         </ListItem.Content>
                     </ListItem>
                 ))
@@ -42,6 +55,11 @@ const styles = StyleSheet.create({
     listItem: {
         backgroundColor: 'black',
     },
+    listItemContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',    
+    },
     title: {
         fontSize: 20,
         fontWeight: 'bold',
@@ -50,5 +68,9 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 13,
         color: 'white',
-    }
+    },
+    menuIcon: {
+        color: 'white',
+
+    },
 });

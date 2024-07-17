@@ -30,12 +30,12 @@ export const ShowPlaylist: React.FC<ShowPlaylistProps> = ({ playlist }) => {
         <View>
             { selectedSong ? (
                 <>
-                    <Pressable 
+                    {/* <Pressable this should be inside the PlayMusic component. 
                         onPress={() => setSelectedSong(null)}
                         style={styles.cancelButton}
                     >
                         <Text style={styles.cancelButtonText}>X</Text>
-                    </Pressable>
+                    </Pressable> */} 
                     <PlayMusic song={selectedSong}/>
                 </>
             ) : (
@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
         padding: 4,
         position: "absolute",
         right: 60,
+        zIndex: 10,
     },
     cancelButtonText: {
         color: 'white',

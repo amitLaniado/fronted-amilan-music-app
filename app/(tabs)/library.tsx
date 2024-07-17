@@ -21,7 +21,10 @@ const LibraryScreen = () => {
   };
 
   const handleCreatePlaylist = () => {
-    playlistName !== "" && createPlaylist(playlistName);
+    if (playlistName !== "") {
+      createPlaylist(playlistName);
+      closeModal();
+    }
   }
 
   const handleSelectPlaylist = (playlist:Playlist) => {

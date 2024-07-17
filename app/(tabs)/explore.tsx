@@ -32,7 +32,6 @@ const ExploreScreen: React.FC = () => {
   const searchSongOptions = async () => {
     if (songOptionName) {
       const songOptions = await fetchSongOptions(songOptionName);
-      console.log("searchOptions: ", songOptions);
       setSongsList(songOptions);
     }
   }

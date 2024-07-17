@@ -39,7 +39,7 @@ export const login = async (userName: string, password: string) => {
     );
     return response.data;
   } catch (error) {
-    console.error("error: ", error);
+    // console.error("error: ", error);
   }
 }
 
@@ -86,9 +86,10 @@ export const createSongToPlaylist = async (song: Song, playlistId: number) => {
 export const deleteSongToPlaylist = async (song: Song, playlistId: number) => {
   try {
     const rawBody: { song_name: string, channel: string, url: string, playlist_id: number} = { song_name: song.title, channel: song.channel, url: song.url, playlist_id: playlistId };
+    console.log("deleteSongToPlaylist rawBody: ", rawBody);
     const response = await axios.delete(
       `${baseUrl}/playlists/delete_song`, 
-      rawBody,
+      { data: rawBody },
     );
     return response.data.playlist_song_id;
   } catch (error) {
@@ -109,7 +110,7 @@ export const fetchPlaylists = async () => {
   }
 }
 
-export const fetchPlaylistSongs = async (playlistId: number) => {
+export const fetchPlaylistSongs = async (playlistId: number): Promise<Song[]>=> {
   try {
     const response = await axios.get(`${baseUrl}/playlists/${playlistId}`);
     return response.data.songs;

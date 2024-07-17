@@ -11,8 +11,7 @@ export const SignIn = () => {
 
     const handleLogin = async () => {
         const result_user = await login(username, password);
-        console.log("result_user: ", result_user);
-        user.updateUser(result_user.user_id);
+        result_user ? user.updateUser(result_user.user_id) : console.error("Incorrect username or password");
     }
 
     return (

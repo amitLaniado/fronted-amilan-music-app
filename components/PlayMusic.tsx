@@ -11,6 +11,7 @@ import * as Font from 'expo-font';
 import { Song } from "@/interfaces";
 
 import { user } from "@/models";
+import { checkIfSongIsLiked } from "@/utils";
 
 interface PlayMusicInterface {
     song: Song
@@ -34,10 +35,14 @@ export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
                 }
             }
         }
-
+        const handleCheckIfSongIsLiked = async () => {
+            setIsLike(await checkIfSongIsLiked(song.url));
+        }
+    
+        handleCheckIfSongIsLiked();
         onCreateComponent();
     }, [song]);
-
+    
     useEffect(() => {
         const loadFonts = async () => {
             await Font.loadAsync({
