@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as FileSystem from 'expo-file-system';
-import { user } from "@/models";
+import { user } from "@/User";
 import { Song } from "@/interfaces";
 
 // const baseUrl = "http://127.0.0.1:8000";

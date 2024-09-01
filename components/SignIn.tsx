@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Pressable, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import { login } from "@/api"; 
 // import { connectUser } from "@/data";
-import { user } from "@/models";
+import { user } from "@/User";
 
 export const SignIn = () => {
     const [isRemember, setIsRemember] = useState<boolean>(false);

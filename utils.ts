@@ -1,6 +1,6 @@
 import { fetchPlaylistSongs } from "./api";
 import { Playlist, Song } from "./interfaces";
-import { user } from "./models";
+import { user } from "./User";
 
 export const checkIfSongIsLiked = async (songUrl: string): Promise<boolean> => {
     console.log("in checking");

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Playlist } from '@/interfaces';
 import { Icon } from 'react-native-elements';
 import { ShowPlaylist } from '@/components/ShowPlaylist';
-import { user } from '@/models';
+import { user } from '@/User';
 import { createPlaylist } from '@/api';
 
 const LibraryScreen = () => {

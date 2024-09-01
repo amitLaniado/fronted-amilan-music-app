@@ -9,7 +9,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 
 import { LoginScreen } from './login';
 
-import { user } from '@/models';
+import { user } from '@/User';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

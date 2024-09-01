@@ -1,48 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import { Icon } from 'react-native-elements';
-import { downloadMP3, createSongToPlaylist, deleteSongToPlaylist } from '@/api';
-import { Audio } from 'expo-av';
-
+import { createSongToPlaylist, deleteSongToPlaylist } from '@/api';
 import Slider from '@react-native-community/slider';
-
 import * as Font from 'expo-font';
-
 import { Song } from "@/interfaces";
-
-import { user } from "@/models";
+import { user } from "@/User";
 import { checkIfSongIsLiked } from "@/utils";
+import SongPlayer from "../SongPlayer";
 
 interface PlayMusicInterface {
-    song: Song
+    song: Song;
 }
 
-export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
+export const PlayMusic: React.FC<PlayMusicInterface> = ({ song }) => {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [isLike, setIsLike] = useState<boolean>(false);
-    const [sound, setSound] = useState<Audio.Sound | null>(null);
     const [currentPosition, setCurrentPosition] = useState<number>(0);
-    const [duration, setDuration] = useState<number>(0);
+    const [songPlayer, setSongPlayer] = useState<SongPlayer | null>(null);
 
     useEffect(() => {
         const onCreateComponent = async () => {
-            console.log("selectSong from explore screen PlayMusic component: ", song);
             if (song) {
-                const path = await downloadMP3(song.url, 'sample.mp3');
-                console.log("path: ", path);
-                if (path) {
-                    playMP3(path);
-                }
+                const player = new SongPlayer(song);
+                setSongPlayer(player);
             }
-        }
+        };
+
         const handleCheckIfSongIsLiked = async () => {
             setIsLike(await checkIfSongIsLiked(song.url));
-        }
-    
+        };
+
         handleCheckIfSongIsLiked();
         onCreateComponent();
     }, [song]);
-    
+
     useEffect(() => {
         const loadFonts = async () => {
             await Font.loadAsync({
@@ -52,71 +44,17 @@ export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
         };
         
         loadFonts();
-    }, [])
+    }, []);
 
-    const getAudioPermissions = async () => {
-        const { status } = await Audio.requestPermissionsAsync();
-        if (status !== 'granted') {
-            alert('Audio permission is required!');
-            return false;
+    useEffect(() => {
+        if (songPlayer) {
+            const interval = setInterval(() => {
+                setCurrentPosition(songPlayer.getCurrentPosition());
+            }, 1000);
+
+            return () => clearInterval(interval);
         }
-        return true;
-    };
-        
-    const playMP3 = async (filePath: string): Promise<void> => {
-
-        const hasPermission = await getAudioPermissions();
-        if (!hasPermission) {
-            console.log("hasPermission = ", hasPermission);
-            return
-        };
-    
-        console.log("playMP3 filePath = ", filePath)
-    
-        await Audio.setAudioModeAsync({
-            // allowsRecordingIOS: false,
-            allowsRecordingIOS: true,
-            staysActiveInBackground: true,
-            playsInSilentModeIOS: true,
-            shouldDuckAndroid: true,
-            playThroughEarpieceAndroid: false,
-        });
-
-        try {    
-            const { sound: newSound } = await Audio.Sound.createAsync({ uri: filePath });
-            setSound(newSound);
-            const status = await newSound.getStatusAsync();
-            if (status.isLoaded) {
-                setDuration(status.durationMillis || 0);
-            }
-
-            newSound.setOnPlaybackStatusUpdate((status) => {
-                if (status.isLoaded) {
-                    setCurrentPosition(status.positionMillis);
-                    if (status.didJustFinish) {
-                        setIsPlaying(false);
-                        newSound.unloadAsync();
-                    }
-                }
-            });
-    
-            await newSound.playAsync();
-            setIsPlaying(true);
-        } catch (error) {
-            console.error("Error playing sound:", error);
-        }
-    };
-
-    const togglePlayPause = async () => {
-        if (sound) {
-            if (isPlaying) {
-                await sound.pauseAsync();
-            } else {
-                await sound.playAsync();
-            }
-            setIsPlaying(!isPlaying);
-        }
-    };
+    }, [songPlayer]);
 
     const formatTime = (milliseconds: number) => {
         const minutes = Math.floor(milliseconds / 60000);
@@ -125,21 +63,29 @@ export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
     };
 
     const getLikePlaylistId = () => {
-        const likePlaylist = user.getPlaylists().find(playlist => playlist.playlist_name == 'liked music')
+        const likePlaylist = user.getPlaylists().find(playlist => playlist.playlist_name == 'liked music');
         return likePlaylist?.playlist_id ?? null;
-    }
+    };
 
     const addOrDeleteSongToLikeSongsPlaylist = () => {
         const likePlaylistId = getLikePlaylistId();
         
-        if (!likePlaylistId)
+        if (!likePlaylistId) {
             return console.error('Liked music playlist not found');
-    
+        }
+
         const action = isLike ? deleteSongToPlaylist : createSongToPlaylist;
         action(song, likePlaylistId);
         setIsLike(!isLike);
-    }
-    
+    };
+
+    const togglePlayPause = () => {
+        if (songPlayer) {
+            songPlayer.stop();
+            setIsPlaying(!isPlaying);
+        }
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.showTimesView}>
@@ -158,14 +104,14 @@ export const PlayMusic:React.FC<PlayMusicInterface> = ({ song }) => {
             </View>
             <View style={styles.showTimesView}>
                 <Text style={styles.showTimesTexts}>{ formatTime(currentPosition) }</Text>
-                <Text style={styles.showTimesTexts}>{ formatTime(duration) }</Text>
+                <Text style={styles.showTimesTexts}>{ formatTime(songPlayer?.getDuration() ?? 0) }</Text>
             </View>
             <Slider
                 style={styles.slider}
                 minimumValue={0}
-                maximumValue={duration}
+                maximumValue={songPlayer?.getDuration() ?? 0}
                 value={currentPosition}
-                onValueChange={(val) => sound && sound.setPositionAsync(val)}
+                onValueChange={(val) => songPlayer && songPlayer.setSoundPos(val)}
                 minimumTrackTintColor="rgb(0, 150, 0)"
                 maximumTrackTintColor="#d3d3d3"
                 thumbTintColor="rgb(0, 130, 0)"
@@ -212,8 +158,7 @@ const styles = StyleSheet.create({
     },
     slider: {
         // paddingTop: -10,
-        marginTop: -5
+        marginTop: -5,
         // marginHorizontal: 5
     },
-  });
-  
+});

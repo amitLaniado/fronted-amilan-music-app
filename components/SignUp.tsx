@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native"
 import { register } from "@/api"; 
-import { user } from "@/models";
+import { user } from "@/User";
 
 export const SignUp = () => {
     const [username, setUsername] =  useState<string>("");
