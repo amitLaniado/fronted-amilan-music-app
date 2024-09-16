@@ -4,6 +4,7 @@ import { SongsList } from "./SongsList";
 import { StyleSheet, Pressable, View, Text } from "react-native";
 import { fetchPlaylistSongs } from "../api"
 import { PlayMusic } from "./PlayMusic";
+import SongBuffer from "@/song_hundle/SongBuffer";
 
 interface ShowPlaylistProps {
     playlist: Playlist;
@@ -36,7 +37,7 @@ export const ShowPlaylist: React.FC<ShowPlaylistProps> = ({ playlist }) => {
                     >
                         <Text style={styles.cancelButtonText}>X</Text>
                     </Pressable> */} 
-                    <PlayMusic song={selectedSong}/>
+                    <PlayMusic songBuffer={new SongBuffer(playlistSongs, playlistSongs.findIndex(song => song.title === selectedSong.title))}/>
                 </>
             ) : (
                 <SongsList list={playlistSongs} onSelectSong={handleSelectSong}/>

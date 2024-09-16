@@ -4,36 +4,40 @@ import { Icon } from 'react-native-elements';
 import { createSongToPlaylist, deleteSongToPlaylist } from '@/api';
 import Slider from '@react-native-community/slider';
 import * as Font from 'expo-font';
-import { Song } from "@/interfaces";
+// import { Song } from "@/interfaces";
+import SongBuffer from "@/song_hundle/SongBuffer";
 import { user } from "@/User";
 import { checkIfSongIsLiked } from "@/utils";
-import SongPlayer from "../SongPlayer";
+// import SongPlayer from "../song_hundle/SongPlayer";
 
 interface PlayMusicInterface {
-    song: Song;
+    // song: Song;
+    songBuffer: SongBuffer;
 }
 
-export const PlayMusic: React.FC<PlayMusicInterface> = ({ song }) => {
+export const PlayMusic: React.FC<PlayMusicInterface> = ({ songBuffer }) => {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [isLike, setIsLike] = useState<boolean>(false);
     const [currentPosition, setCurrentPosition] = useState<number>(0);
-    const [songPlayer, setSongPlayer] = useState<SongPlayer | null>(null);
+    // const [songPlayer, setSongPlayer] = useState<SongPlayer | null>(null);
 
     useEffect(() => {
         const onCreateComponent = async () => {
-            if (song) {
-                const player = new SongPlayer(song);
-                setSongPlayer(player);
+            if (songBuffer) {
+                await songBuffer.loadSong(songBuffer.getCurrentIndex());
+                songBuffer.playCurrentSong();
+                // const player = new SongPlayer(song);
+                // setSongPlayer(player);
             }
         };
 
         const handleCheckIfSongIsLiked = async () => {
-            setIsLike(await checkIfSongIsLiked(song.url));
+            setIsLike(await checkIfSongIsLiked(songBuffer.getCurrentSong().url));
         };
 
         handleCheckIfSongIsLiked();
         onCreateComponent();
-    }, [song]);
+    }, [songBuffer]);
 
     useEffect(() => {
         const loadFonts = async () => {
@@ -47,14 +51,15 @@ export const PlayMusic: React.FC<PlayMusicInterface> = ({ song }) => {
     }, []);
 
     useEffect(() => {
-        if (songPlayer) {
+        const currSongPlayer = songBuffer.getSongPlayer();
+        if (currSongPlayer) {
             const interval = setInterval(() => {
-                setCurrentPosition(songPlayer.getCurrentPosition());
+                setCurrentPosition(currSongPlayer.getCurrentPosition());
             }, 1000);
 
             return () => clearInterval(interval);
         }
-    }, [songPlayer]);
+    }, [songBuffer.getSongPlayer()]);
 
     const formatTime = (milliseconds: number) => {
         const minutes = Math.floor(milliseconds / 60000);
@@ -75,13 +80,14 @@ export const PlayMusic: React.FC<PlayMusicInterface> = ({ song }) => {
         }
 
         const action = isLike ? deleteSongToPlaylist : createSongToPlaylist;
-        action(song, likePlaylistId);
+        action(songBuffer.getCurrentSong(), likePlaylistId);
         setIsLike(!isLike);
     };
 
     const togglePlayPause = () => {
-        if (songPlayer) {
-            songPlayer.stop();
+        const currSongPlayer = songBuffer.getSongPlayer();
+        if (currSongPlayer) {
+            currSongPlayer.stop();
             setIsPlaying(!isPlaying);
         }
     };
@@ -90,8 +96,8 @@ export const PlayMusic: React.FC<PlayMusicInterface> = ({ song }) => {
         <View style={styles.container}>
             <View style={styles.showTimesView}>
                 <View>
-                    <Text style={styles.songTitle}>{song.title}</Text>
-                    <Text style={styles.songChannel}>{song.channel}</Text>
+                    <Text style={styles.songTitle}>{songBuffer.getCurrentSong().title}</Text>
+                    <Text style={styles.songChannel}>{songBuffer.getCurrentSong().channel}</Text>
                 </View>
                 <TouchableOpacity onPress={addOrDeleteSongToLikeSongsPlaylist}>
                     <Icon
@@ -104,14 +110,14 @@ export const PlayMusic: React.FC<PlayMusicInterface> = ({ song }) => {
             </View>
             <View style={styles.showTimesView}>
                 <Text style={styles.showTimesTexts}>{ formatTime(currentPosition) }</Text>
-                <Text style={styles.showTimesTexts}>{ formatTime(songPlayer?.getDuration() ?? 0) }</Text>
+                <Text style={styles.showTimesTexts}>{ formatTime(songBuffer.getSongPlayer()?.getDuration() ?? 0) }</Text>
             </View>
             <Slider
                 style={styles.slider}
                 minimumValue={0}
-                maximumValue={songPlayer?.getDuration() ?? 0}
+                maximumValue={songBuffer.getSongPlayer()?.getDuration() ?? 0}
                 value={currentPosition}
-                onValueChange={(val) => songPlayer && songPlayer.setSoundPos(val)}
+                onValueChange={(val) => songBuffer.getSongPlayer() && songBuffer.getSongPlayer()?.setSoundPos(val)}
                 minimumTrackTintColor="rgb(0, 150, 0)"
                 maximumTrackTintColor="#d3d3d3"
                 thumbTintColor="rgb(0, 130, 0)"

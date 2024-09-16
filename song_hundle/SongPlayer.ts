@@ -1,29 +1,27 @@
 import { Audio } from "expo-av";
-import { Song } from "./interfaces";
+import { Song } from "../interfaces";
 
 class SongPlayer {
-    private song: Song;
+    // private song: Song;
     private sound: Audio.Sound | null = null;
     private isPlaying: boolean = false;
     private currentPosition: number = 0;
     private duration: number = 0;
-    // private path: string | null = null;
+    private filePath: string;
 
-    constructor(song: Song) {
-        this.song = song;
-        // this.initialize();
+    constructor(filePath: string) {
+        this.filePath = filePath;
+        this.initialize();
     }
 
-    // private async initialize() {
-    //     try {
-    //         this.path = await downloadMP3(this.song.url, 'sample.mp3');
-    //         if (this.path) {
-    //             await this.play(this.path);
-    //         }
-    //     } catch (error) {
-    //         console.error("Error initializing SongPlayer:", error);
-    //     }
-    // }
+    private async initialize() {
+        const hasPermission = await this.getAudioPermissions(); // TODO: only when the application is opned, the application would ask for permissions. 
+        if (!hasPermission) return;
+
+        await this.configAudioMode();
+        await this.setupAudio();
+
+    }
 
     private async getAudioPermissions(): Promise<boolean> {
         const { status } = await Audio.requestPermissionsAsync();
@@ -44,9 +42,9 @@ class SongPlayer {
         });
     }
 
-    private async loadAudio(filePath: string): Promise<Audio.Sound | null> {
+    private async loadAudio(): Promise<Audio.Sound | null> {
         try {
-            const { sound: newSound } = await Audio.Sound.createAsync({ uri: filePath });
+            const { sound: newSound } = await Audio.Sound.createAsync({ uri: this.filePath });
             const status = await newSound.getStatusAsync();
             if (status.isLoaded) {
                 this.duration = status.durationMillis || 0;
@@ -59,8 +57,8 @@ class SongPlayer {
         }
     }
 
-    private async setupAudio(filePath: string): Promise<void> {
-        const newSound = await this.loadAudio(filePath);
+    private async setupAudio(): Promise<void> {
+        const newSound = await this.loadAudio();
         if (newSound) {
             this.sound = newSound;
             this.sound?.setOnPlaybackStatusUpdate((status) => {
@@ -75,13 +73,7 @@ class SongPlayer {
         }
     }
 
-    public async play(filePath: string) {
-        const hasPermission = await this.getAudioPermissions();
-        if (!hasPermission) return;
-
-        await this.configAudioMode();
-        await this.setupAudio(filePath);
-
+    public async play() {
         try {
             await this.sound?.playAsync();
             this.isPlaying = true;
