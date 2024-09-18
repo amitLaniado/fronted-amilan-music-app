@@ -9,8 +9,9 @@ export const SignUp = () => {
     const [password, setPassword]=  useState<string>("");
 
     const handleRegister = async () => {
+        console.log("try to register")
         const result_user = await register(username, email, password);
-        user.updateUser(result_user);
+        result_user && user.updateUser(result_user.user_id);
     }
 
     return (

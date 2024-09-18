@@ -18,6 +18,7 @@ class SongBuffer {
         // const currentSong: Song = this.songs[this.currentIndex];
         const currSongPath = this.savedPaths[this.getCurrentSong().url];
         this.songPlayer = new SongPlayer(currSongPath);
+        this.songPlayer.play();
         // this.songPlayer.play(this.savedPaths[currentSong.url]);
     }
 

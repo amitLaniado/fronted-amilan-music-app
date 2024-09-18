@@ -1,10 +1,11 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import * as FileSystem from 'expo-file-system';
 import { user } from "@/User";
 import { Song } from "@/interfaces";
 
 // const baseUrl = "http://127.0.0.1:8000";
-const baseUrl = "https://backend-amilan-music-app.onrender.com";
+// const baseUrl = "https://backend-amilan-music-app.onrender.com";
+const baseUrl = "http://10.0.0.22:8000";
 
 export const fetchSongOptions = async (songName: string) => {
     try {
@@ -32,24 +33,37 @@ export const downloadMP3 = async (songUrl: string, fileName: string): Promise<st
 
 export const login = async (userName: string, password: string) => {
   try {
-    const rawBody: { user_name: string, password: string} = { user_name: userName, password: password };
+    const rawBody: { name: string, password: string} = { name: userName, password };
     const response = await axios.post(
       `${baseUrl}/users/login`, 
       rawBody,
     );
     return response.data;
-  } catch (error) {
-    // console.error("error: ", error);
+  }
+  catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 401) {
+        return -1;
+      } else {
+        console.error("Other error: ", error.response?.status);
+        return null;
+      }
+    } else {
+      console.error("Unexpected error: ", error);
+      return null;
+    }
   }
 }
 
-export const register = async (userName: string, email: string, password: string) => {
+export const register = async (name: string, email: string, password: string) => {
   try {
-    const rawBody: { user_name: string, email: string, password: string} = { user_name: userName, email: email, password: password };
+    console.log("try to register 22222: ", name, email, password);
+    const rawBody: { name: string, email: string, password: string} = { name, email, password };
     const response = await axios.post(
       `${baseUrl}/users/register`, 
       rawBody,
     );
+    console.log(response)
     return response.data;
   } catch (error) {
     console.error("error: ", error);
@@ -102,7 +116,7 @@ export const fetchPlaylists = async () => {
     const response = await axios.get(
       `${baseUrl}/playlists/user/${user.getUserId()}`
     );
-    console.log("songs: ", response);
+    console.log("response.data.playlists: ", response.data.playlists);
     return response.data.playlists;
   } catch (error) {
     console.error("error: ", error);

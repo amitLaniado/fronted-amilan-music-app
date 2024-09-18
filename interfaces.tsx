@@ -6,8 +6,8 @@ export interface Song {
 }
 
 export interface Playlist {
-    playlist_id: number;
-    playlist_name: string;
+    id: number;
+    name: string;
     songs_amount: number;
 }
 

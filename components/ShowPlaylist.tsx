@@ -16,7 +16,7 @@ export const ShowPlaylist: React.FC<ShowPlaylistProps> = ({ playlist }) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const songs = await fetchPlaylistSongs(playlist.playlist_id);
+            const songs = await fetchPlaylistSongs(playlist.id);
             setPlaylistSongs(songs);
         };
 

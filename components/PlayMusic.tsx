@@ -19,6 +19,10 @@ export const PlayMusic: React.FC<PlayMusicInterface> = ({ songBuffer }) => {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [isLike, setIsLike] = useState<boolean>(false);
     const [currentPosition, setCurrentPosition] = useState<number>(0);
+    
+    const [title, setTitle] = useState<string>('');
+    const [channel, setChannel] = useState<string>('');
+    const [duration, setDuration] = useState<number>(0);
     // const [songPlayer, setSongPlayer] = useState<SongPlayer | null>(null);
 
     useEffect(() => {
@@ -53,6 +57,8 @@ export const PlayMusic: React.FC<PlayMusicInterface> = ({ songBuffer }) => {
     useEffect(() => {
         const currSongPlayer = songBuffer.getSongPlayer();
         if (currSongPlayer) {
+            setDuration(currSongPlayer.getDuration())
+
             const interval = setInterval(() => {
                 setCurrentPosition(currSongPlayer.getCurrentPosition());
             }, 1000);
@@ -61,6 +67,14 @@ export const PlayMusic: React.FC<PlayMusicInterface> = ({ songBuffer }) => {
         }
     }, [songBuffer.getSongPlayer()]);
 
+    useEffect(() => {
+        const currSong = songBuffer.getCurrentSong();
+        if (currSong) {
+            setTitle(currSong.title);
+            setChannel(currSong.channel);
+        }
+    }, [songBuffer.getCurrentSong()]);
+
     const formatTime = (milliseconds: number) => {
         const minutes = Math.floor(milliseconds / 60000);
         const seconds = Math.floor((milliseconds % 60000) / 1000);
@@ -68,8 +82,8 @@ export const PlayMusic: React.FC<PlayMusicInterface> = ({ songBuffer }) => {
     };
 
     const getLikePlaylistId = () => {
-        const likePlaylist = user.getPlaylists().find(playlist => playlist.playlist_name == 'liked music');
-        return likePlaylist?.playlist_id ?? null;
+        const likePlaylist = user.getPlaylists().find(playlist => playlist.name == 'liked music');
+        return likePlaylist?.id ?? null;
     };
 
     const addOrDeleteSongToLikeSongsPlaylist = () => {
@@ -96,8 +110,8 @@ export const PlayMusic: React.FC<PlayMusicInterface> = ({ songBuffer }) => {
         <View style={styles.container}>
             <View style={styles.showTimesView}>
                 <View>
-                    <Text style={styles.songTitle}>{songBuffer.getCurrentSong().title}</Text>
-                    <Text style={styles.songChannel}>{songBuffer.getCurrentSong().channel}</Text>
+                    <Text style={styles.songTitle}>{title}</Text>
+                    <Text style={styles.songChannel}>{channel}</Text>
                 </View>
                 <TouchableOpacity onPress={addOrDeleteSongToLikeSongsPlaylist}>
                     <Icon
@@ -110,12 +124,12 @@ export const PlayMusic: React.FC<PlayMusicInterface> = ({ songBuffer }) => {
             </View>
             <View style={styles.showTimesView}>
                 <Text style={styles.showTimesTexts}>{ formatTime(currentPosition) }</Text>
-                <Text style={styles.showTimesTexts}>{ formatTime(songBuffer.getSongPlayer()?.getDuration() ?? 0) }</Text>
+                <Text style={styles.showTimesTexts}>{ formatTime(duration) }</Text>
             </View>
             <Slider
                 style={styles.slider}
                 minimumValue={0}
-                maximumValue={songBuffer.getSongPlayer()?.getDuration() ?? 0}
+                maximumValue={duration}
                 value={currentPosition}
                 onValueChange={(val) => songBuffer.getSongPlayer() && songBuffer.getSongPlayer()?.setSoundPos(val)}
                 minimumTrackTintColor="rgb(0, 150, 0)"

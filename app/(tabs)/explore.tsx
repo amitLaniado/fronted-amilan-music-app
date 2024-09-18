@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native';
 
 import { Song } from '@/interfaces';
+import SongBuffer from '@/song_hundle/SongBuffer';
 
 import { SearchBar } from '@/components/SearchBar';
 import { SongsList } from '@/components/SongsList';
 import { PlayMusic } from '@/components/PlayMusic';
 
 import { fetchSongOptions } from '@/api';
+
 
 
 const ExploreScreen: React.FC = () => {
@@ -47,7 +49,7 @@ const ExploreScreen: React.FC = () => {
   return (
     <SafeAreaView style={{ gap: 10 }}>
       { selectedSong ? (
-        <PlayMusic song={selectedSong}/>
+        <PlayMusic songBuffer={new SongBuffer([selectedSong], 0)}/>
       ) : (
         <>
           <SearchBar onSongOptionNameChange={handleSongOptionName}/>
